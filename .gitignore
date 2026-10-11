@@ -1,0 +1,7 @@
+/target/
+**/target/
+**/output/
+**/preview*.png
+/.cargo-cache/
+**/__pycache__/
+*.py[cod]

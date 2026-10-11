@@ -1,0 +1,32 @@
+[package]
+name = "ratatui-typst"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+description = "Typeset equations for Ratatui, powered by Typst"
+license = "MIT"
+repository = "https://github.com/SosiNone/ratatui-typst"
+documentation = "https://docs.rs/ratatui-typst"
+readme = "README.md"
+keywords = ["ratatui", "typst", "math", "terminal", "tui"]
+categories = ["command-line-interface", "rendering"]
+include = [
+    "/src/**", "/tests/**", "/examples/**", "/licenses/**", "/docs/**",
+    "/Cargo.toml", "/Cargo.lock", "/README.md", "/CHANGELOG.md",
+    "/CONTRIBUTING.md", "/LICENSE",
+]
+publish = false
+
+[workspace]
+members = ["demo"]
+default-members = ["."]
+resolver = "3"
+
+[dependencies]
+image = { version = "0.25", default-features = false }
+ratatui = "0.30.2"
+ratatui-image = { version = "11.1", default-features = false, features = ["crossterm"] }
+typst = "0.15.1"
+typst-assets = { version = "0.15.1", features = ["fonts"] }
+typst-render = "0.15.1"
+typst-layout = "0.15.1"

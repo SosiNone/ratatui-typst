@@ -1,0 +1,75 @@
+version: '3'
+
+dir: '{{.ROOT_DIR}}'
+
+vars:
+  RUN: 'cargo run --locked -p ratatui-typst-demo --'
+
+tasks:
+  check:
+    desc: Check the library and demo workspace
+    cmds:
+      - cargo fmt --all -- --check
+      - cargo clippy --workspace --all-targets --locked -- -D warnings
+      - cargo test --workspace --locked
+      - cargo run --locked -p ratatui-typst --example terminal -- --smoke
+      - cargo doc --locked -p ratatui-typst --no-deps
+
+  terminal:
+    desc: Run the public API and terminal lifecycle example
+    interactive: true
+    cmds:
+      - cargo run --locked -p ratatui-typst --example terminal -- {{.CLI_ARGS}}
+
+  package:
+    desc: Build and verify the library archive without publishing
+    cmds:
+      - cargo package --locked -p ratatui-typst
+
+  default:
+    desc: List the available examples
+    silent: true
+    cmds:
+      - task --list
+
+  quadratic:
+    desc: Show the quadratic formula
+    interactive: true
+    cmds:
+      - "{{.RUN}} {{.CLI_ARGS}} 'x = (-b plus.minus sqrt(b^2 - 4 a c)) / (2 a)'"
+
+  integral:
+    desc: Show the Gaussian integral
+    interactive: true
+    cmds:
+      - "{{.RUN}} {{.CLI_ARGS}} 'integral_0^infinity e^(-x^2) dif x = sqrt(pi) / 2'"
+
+  sum:
+    desc: Show the sum of the first n integers
+    interactive: true
+    cmds:
+      - "{{.RUN}} {{.CLI_ARGS}} 'sum_(k=1)^n k = n(n+1) / 2'"
+
+  matrix:
+    desc: Show a 2-by-2 matrix
+    interactive: true
+    cmds:
+      - "{{.RUN}} {{.CLI_ARGS}} 'A = mat(1, 2; 3, 4)'"
+
+  demo:
+    desc: Open the interactive capability explorer
+    interactive: true
+    cmds:
+      - "{{.RUN}} {{.CLI_ARGS}}"
+
+  previews:
+    desc: Export all four examples to output without opening the TUI
+    cmds:
+      - task: quadratic
+        vars: { CLI_ARGS: '--png output/preview-quadratic.png' }
+      - task: integral
+        vars: { CLI_ARGS: '--png output/preview-integral.png' }
+      - task: sum
+        vars: { CLI_ARGS: '--png output/preview-sum.png' }
+      - task: matrix
+        vars: { CLI_ARGS: '--png output/preview-matrix.png' }
