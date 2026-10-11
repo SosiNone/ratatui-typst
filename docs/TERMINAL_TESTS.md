@@ -58,4 +58,6 @@ separately if you intend to claim support for them.
   terminal version, cell dimensions, and individual procedure results have not
   yet been recorded. Lifecycle coverage and exit cleanup remain unconfirmed.
 - Real Kitty procedure is **not run**; deferred beyond 0.1.0.
-- Linux and Rust 1.92 CI results are pending the initial repository push.
+- Windows/Linux stable and Linux Rust 1.92 passed the
+  [initial workspace CI run](https://github.com/SosiNone/ratatui-typst/actions/runs/38145063622).
+  These are headless results, not additional real-terminal graphics evidence.

@@ -1,8 +1,9 @@
 # First Public Release Preparation
 
 Target: **0.1.0**, source crate, with Windows Terminal as the initial terminal
-validation target. Status on **2026-10-11**: locally prepared; the maintainer
-reports good Windows rendering and confirms the **Sixel** backend. Individual
+validation target. Status on **2026-10-11**: initial repository committed and
+pushed. The maintainer reports good Windows rendering and confirms the **Sixel**
+backend. Individual
 lifecycle checks still need recording. Kitty validation is deferred and does
 not block 0.1.0.
 Repository: https://github.com/SosiNone/ratatui-typst.
@@ -20,18 +21,20 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [x] Add changelog, consumer CI check, and local crate archive verification.
 - [x] Consolidate the library, demo, and tools into one workspace with a shared
   lockfile; remove obsolete experiments and refresh contributor documentation.
+- [x] Push the reviewed [initial commit](https://github.com/SosiNone/ratatui-typst/commit/dfb78df0839ee2e646787f583eb42745628549ca) to `main`.
+- [x] Review the candidate archive from the clean initial Git commit; verify
+  the extracted library and its public consumer without the workspace demo.
+- [x] Pass workspace CI on Windows stable, Linux stable, and Linux Rust 1.92.
 - [x] Query crates.io: `ratatui-typst` returned HTTP 404 on 2026-10-11; no existing
   crate was returned. This does not reserve or guarantee the name.
 
 ## Remaining release gates
 
-- [ ] Push the initial reviewed commit and pass CI on Windows, Linux, and Rust 1.92.
 - [ ] Finalize the Windows Terminal report using [TERMINAL_TESTS.md](TERMINAL_TESTS.md),
   recording completed lifecycle checks and exit cleanup. The maintainer has
   confirmed Sixel as the detected backend and reported good visual rendering.
 - [ ] Confirm the desired crates.io name is still available and configure the
   publishing account/ownership immediately before publishing.
-- [ ] Review this candidate and its archive after the initial Git commit.
 - [ ] Set a release date in [CHANGELOG.md](../CHANGELOG.md) and explicitly enable publishing after
   those gates pass. `publish = false` is intentionally retained for preparation.
 
@@ -60,10 +63,25 @@ Host: Windows, Rust/Cargo 1.93.0. These are local results, not remote CI evidenc
 | Interactive PTY | Half-block startup, placement, overlay, replacement/error, hide/show, alpha and clean exit |
 | Windows SIXEL rendering | Maintainer reports good visual results and confirms Sixel; individual lifecycle checks and exit cleanup unconfirmed |
 | Real Kitty | Not run; deferred beyond 0.1.0 |
-| Linux / Rust 1.92 | CI configured; not run locally |
+| Linux / Rust 1.92 | Passed remote CI; not run locally |
 
 Installed Windows Terminal version: 1.24.12741.0. Confirm the version used in the
 manual report; the Sixel backend was confirmed separately by the maintainer.
+
+## Remote CI evidence
+
+The [initial commit CI run](https://github.com/SosiNone/ratatui-typst/actions/runs/38145063622)
+checks the same library/demo sources on all three targets:
+
+| Environment | Result |
+| --- | --- |
+| Windows, stable Rust | Passed |
+| Linux, stable Rust | Passed |
+| Linux, Rust 1.92.0 | Passed |
+
+Each job checks formatting, workspace Clippy/tests, the public consumer smoke
+sequence, demo PNG export, library documentation, and standalone crate packaging.
+These headless checks do not complete the manual SIXEL lifecycle report.
 
 ## Reproduce before publishing
 
