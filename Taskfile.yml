@@ -30,7 +30,7 @@ tasks:
     desc: List the available examples
     silent: true
     cmds:
-      - task --list
+      - '"{{.TASK_EXE}}" --list'
 
   quadratic:
     desc: Show the quadratic formula
