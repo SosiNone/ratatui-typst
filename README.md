@@ -6,48 +6,84 @@ executable, LaTeX installation, or PNG round trip is needed to display math.
 
 This is an **unpublished 0.1.0 candidate** with a provisional API. The project and
 crate name is `ratatui-typst`; Rust imports use `ratatui_typst`.
-See [architecture](docs/ARCHITECTURE.md) and [CONTRIBUTING.md](CONTRIBUTING.md)
-for the development workflow. Release status and remaining gates are tracked
-in [the release checklist](docs/RELEASE.md). Repository: [SosiNone/ratatui-typst](https://github.com/SosiNone/ratatui-typst).
+Repository: [SosiNone/ratatui-typst](https://github.com/SosiNone/ratatui-typst).
 
-## Requirements and development
+![Guided tour showing the quadratic formula, terminal notebook text, scene navigation, and editable Typst source](assets/demo/terminal.png)
 
-Requires Rust 1.92 or newer. The first build compiles Typst and can take several
-minutes; embedded typesetting adds substantial build and binary size. Fonts are embedded through
-`typst-assets`; installed fonts and the current working directory do not affect
-font discovery.
+The demo pairs typeset equations with ordinary terminal text. Take a six-scene
+tour, then switch to the explorer to edit math and tune rendering.
+See the [demo guide](demo/README.md) for screenshot details and controls.
 
-From this repository root, run the development checks with
-[Task](https://taskfile.dev/):
+## Run the demo
+
+Requires **Rust 1.92+** and a terminal at least **76 columns by 24 rows**.
+The first build compiles Typst and can take several minutes. No Typst CLI or
+LaTeX installation is needed. From the repository root:
 
 ```sh
-task check       # Formatting, Clippy, tests, and documentation
+# Guided tour (or: task demo)
+cargo run --locked -p ratatui-typst-demo
+
+# Skip graphics detection and use the coarse character fallback
+cargo run --locked -p ratatui-typst-demo -- --halfblocks
+
+# Open the explorer with your own Typst math, without $ delimiters
+cargo run --locked -p ratatui-typst-demo -- 'A = mat(1, 2; 3, 4)'
+
+# Export an equation without opening the terminal UI
+cargo run --locked -p ratatui-typst-demo -- --png output/equation.png
 ```
 
-Or use Cargo directly, as detailed in [CONTRIBUTING.md](CONTRIBUTING.md):
+Use **n / p or arrows** to navigate scenes, **x** to switch tour / explorer,
+**e** to edit, **Tab** for rendering controls, and **c** to compare Note / Console /
+Plain contexts. **s** saves a PNG; **q** quits. Enter compiles an edit; Esc cancels it.
+
+Graphics detection runs once at startup. Windows Terminal with SIXEL is the
+initial validation target; detection failures fall back to half-block characters.
+PowerShell is a shell, so graphics support depends on its terminal host.
+Kitty is available through ratatui-image but remains unverified for 0.1.0.
+See the [terminal validation procedure](docs/TERMINAL_TESTS.md) for current evidence.
+
+## Rendered examples
+
+These PNGs come directly from the embedded renderer, using an opaque Paper
+palette so they stay readable in light and dark README themes. They demonstrate
+typesetting output; they are separate from the terminal screenshot above.
+
+| Quadratic formula | Gaussian integral |
+| --- | --- |
+| ![Quadratic formula with plus or minus, a square root, and a fraction](assets/demo/quadratic.png) | ![Gaussian integral from zero to infinity equals square root of pi divided by two](assets/demo/integral.png) |
+| `x = (-b plus.minus sqrt(b^2 - 4 a c)) / (2 a)` | `integral_0^infinity e^(-x^2) dif x = sqrt(pi) / 2` |
+
+| Matrix | Piecewise function |
+| --- | --- |
+| ![Two by two matrix A with rows one two and three four](assets/demo/matrix.png) | ![Absolute value defined as x for nonnegative x and minus x for negative x](assets/demo/piecewise.png) |
+| `A = mat(1, 2; 3, 4)` | `abs(x) = cases(x &"if " x >= 0, -x &"if " x < 0)` |
+
+Regenerate all four images from the same built-in examples:
 
 ```sh
+cargo run --locked -p ratatui-typst-demo -- --showcase-assets assets/demo
+# Or: task showcase-assets
+```
+
+## Development
+
+The root package is the library and default workspace member; the unpublished
+demo shares its lockfile and is excluded from the library archive. Embedded
+typesetting adds substantial build and binary size. Fonts are bundled through
+`typst-assets`; installed fonts and the working directory do not affect discovery.
+
+Run the checks with [Task](https://taskfile.dev/), or use Cargo directly:
+
+```sh
+task check
 cargo test --workspace --locked
 cargo doc --locked -p ratatui-typst --no-deps
 ```
 
-The root package is the library and default workspace member. The repository
-also includes the interactive [demo](https://github.com/SosiNone/ratatui-typst/blob/main/demo/README.md), a small public API example,
-tests, documentation, release tooling, and font notices. Both packages share
-one lockfile. The demo is unpublished and excluded from the library archive.
-
-Explore the crate with ordinary terminal text around each rendered equation:
-
-```sh
-cargo run --locked -p ratatui-typst-demo
-cargo run --locked -p ratatui-typst-demo -- --halfblocks
-cargo run --locked -p ratatui-typst-demo -- --png output/equation.png
-```
-
-Browse examples, press `e` to edit math, Tab to select rendering controls, and
-`c` to switch Note / Console / Plain contexts. `s` exports a PNG; `q` quits.
-Optional Task commands include `task demo`, `task previews`, and `task check`.
-For the smaller terminal lifecycle example:
+See [CONTRIBUTING.md](CONTRIBUTING.md), [architecture](docs/ARCHITECTURE.md), and
+the [release checklist](docs/RELEASE.md). For the smaller public API example:
 
 ```sh
 cargo run --locked --example terminal                 # Detect terminal graphics
@@ -58,14 +94,6 @@ cargo run --locked --example terminal -- --smoke       # Headless consumer check
 The example uses only public APIs and exercises replacement, errors, movement,
 overlays, hiding, shrinking, and transparency. See the [terminal test procedure](docs/TERMINAL_TESTS.md)
 and [API review](docs/API_REVIEW.md).
-
-Windows Terminal with SIXEL is the initial release's terminal validation target.
-The maintainer reports good rendering on Windows with the Sixel backend;
-detailed lifecycle results are still to be recorded. PowerShell is the shell;
-graphics support comes from its terminal host. Kitty graphics are available
-through ratatui-image but remain unverified for 0.1.0; validation is deferred
-beyond the initial release. Other terminals can fall back to coarse half-block
-characters.
 
 ## Library use
 

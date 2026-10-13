@@ -11,7 +11,14 @@ use ratatui::{
 use ratatui_image::picker::{Picker, ProtocolType};
 use ratatui_typst::{MathRenderer, PreparedEquation, RenderOptions, RenderedEquation};
 
+use crate::tour::SCENES;
 use crate::{editor::Editor, examples::EXAMPLES, export_png, preview::PreviewContext};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Mode {
+    Tour,
+    Explorer,
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Focus {
@@ -39,6 +46,7 @@ pub fn demo_options(cell_height_pixels: u16) -> RenderOptions {
 }
 
 pub struct App {
+    pub mode: Mode,
     renderer: MathRenderer,
     pub picker: Picker,
     detected_protocol: ProtocolType,
@@ -62,10 +70,22 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(renderer: MathRenderer, picker: Picker, source: &str, status: String) -> Self {
+    pub fn new(
+        renderer: MathRenderer,
+        picker: Picker,
+        source: Option<&str>,
+        status: String,
+    ) -> Self {
+        let mode = if source.is_some() {
+            Mode::Explorer
+        } else {
+            Mode::Tour
+        };
+        let source = source.unwrap_or(EXAMPLES[SCENES[0].example].source);
         let selected = EXAMPLES.iter().position(|example| example.source == source);
         let options = demo_options(picker.font_size().height);
         let mut app = Self {
+            mode,
             renderer,
             detected_protocol: picker.protocol_type(),
             picker,
@@ -87,8 +107,34 @@ impl App {
             status,
             diagnostic_scroll: 0,
         };
-        app.render();
+        if mode == Mode::Tour {
+            app.select_scene(0);
+        } else {
+            app.render();
+        }
         app
+    }
+
+    pub fn scene_index(&self) -> Option<usize> {
+        SCENES
+            .iter()
+            .position(|scene| EXAMPLES[scene.example].source == self.source)
+    }
+
+    fn select_scene(&mut self, index: usize) {
+        let scene = &SCENES[index];
+        self.gallery.select(Some(scene.example));
+        self.source = EXAMPLES[scene.example].source.to_owned();
+        self.editor = Editor::new(&self.source);
+        self.options = demo_options(self.picker.font_size().height);
+        self.options.text_size_pt = (self.options.text_size_pt * 1.5).clamp(8.0, 48.0);
+        self.options.padding_pt = 4.0;
+        self.palette = scene.palette;
+        self.options.foreground = PALETTES[self.palette].1;
+        self.options.background = PALETTES[self.palette].2;
+        self.context = scene.context;
+        self.render();
+        self.status = format!("Scene {} / {}: {}", index + 1, SCENES.len(), scene.title);
     }
 
     fn render(&mut self) {
@@ -213,14 +259,25 @@ impl App {
         }
         match key.code {
             KeyCode::Char('q') | KeyCode::Esc => return true,
+            KeyCode::Char('x') => {
+                self.mode = if self.mode == Mode::Tour {
+                    Mode::Explorer
+                } else {
+                    Mode::Tour
+                };
+                self.focus = Focus::Gallery;
+                self.status = "View switched; equation and settings preserved.".to_owned();
+            }
             KeyCode::Tab | KeyCode::BackTab => {
-                self.focus = if self.focus == Focus::Gallery {
+                self.focus = if self.mode == Mode::Tour || self.focus == Focus::Gallery {
                     Focus::Settings
                 } else {
                     Focus::Gallery
                 };
+                self.mode = Mode::Explorer;
             }
             KeyCode::Char('e') => {
+                self.mode = Mode::Explorer;
                 self.editor = Editor::new(&self.source);
                 self.focus = Focus::Editor;
             }
@@ -233,6 +290,8 @@ impl App {
             }
             KeyCode::Char('n') => self.browse(1),
             KeyCode::Char('p') => self.browse(-1),
+            KeyCode::Left if self.mode == Mode::Tour => self.browse(-1),
+            KeyCode::Right if self.mode == Mode::Tour => self.browse(1),
             KeyCode::Up | KeyCode::Char('k') => {
                 if self.focus == Focus::Gallery {
                     self.browse(-1);
@@ -254,6 +313,12 @@ impl App {
                 self.adjust(1)
             }
             KeyCode::Char('r') => {
+                if self.mode == Mode::Tour
+                    && let Some(index) = self.scene_index()
+                {
+                    self.select_scene(index);
+                    return false;
+                }
                 self.options = demo_options(self.picker.font_size().height);
                 self.palette = 0;
                 self.halfblocks = false;
@@ -270,6 +335,15 @@ impl App {
     }
 
     fn browse(&mut self, delta: isize) {
+        if self.mode == Mode::Tour {
+            let index = self
+                .scene_index()
+                .map_or(if delta < 0 { SCENES.len() - 1 } else { 0 }, |index| {
+                    (index as isize + delta).rem_euclid(SCENES.len() as isize) as usize
+                });
+            self.select_scene(index);
+            return;
+        }
         let index = self
             .gallery
             .selected()

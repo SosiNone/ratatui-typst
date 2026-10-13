@@ -1,8 +1,9 @@
 use crate::{
-    app::{App, Focus, PALETTES},
+    app::{App, Focus, Mode, PALETTES},
     examples::EXAMPLES,
     preview,
 };
+
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
@@ -10,6 +11,14 @@ use ratatui::{
     text::Line,
     widgets::{Block, List, ListItem, Paragraph, Wrap},
 };
+
+pub fn equation_area(area: Rect, app: &App) -> Rect {
+    if app.mode == Mode::Tour {
+        crate::tour::equation_area(area, app)
+    } else {
+        areas(area).equation(app)
+    }
+}
 
 const BACKGROUND: Color = Color::Rgb(16, 20, 28);
 const FOREGROUND: Color = Color::Rgb(227, 234, 244);
@@ -96,6 +105,10 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             .block(block(" ratatui-typst explorer ", true)),
             area,
         );
+        return;
+    }
+    if app.mode == Mode::Tour {
+        crate::tour::draw(frame, app);
         return;
     }
     let a = areas(area);
@@ -250,7 +263,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let help = if editing {
         " Enter render | Alt+Enter newline | arrows move | Esc cancel | Ctrl+C quit"
     } else {
-        " Tab panel | arrows adjust | e edit | c context | n/p | r reset | s PNG | q quit"
+        " Tab panel | arrows | e edit | x tour | c context | n/p | r reset | s PNG | q quit"
     };
     frame.render_widget(
         Paragraph::new(vec![

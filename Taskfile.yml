@@ -73,3 +73,8 @@ tasks:
         vars: { CLI_ARGS: '--png output/preview-sum.png' }
       - task: matrix
         vars: { CLI_ARGS: '--png output/preview-matrix.png' }
+
+  showcase-assets:
+    desc: Regenerate the four equation images used in the README
+    cmds:
+      - '{{.RUN}} --showcase-assets assets/demo'

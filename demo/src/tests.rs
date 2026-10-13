@@ -8,10 +8,11 @@ use ratatui_image::picker::Picker;
 use ratatui_typst::MathRenderer;
 
 use crate::{
-    app::{App, Focus},
+    app::{App, Focus, Mode, PALETTES},
     editor::Editor,
     examples::EXAMPLES,
     preview::{self, PreviewContext},
+    tour::SCENES,
     ui,
 };
 
@@ -19,9 +20,232 @@ fn app(source: &str) -> App {
     App::new(
         MathRenderer::new(),
         Picker::halfblocks(),
-        source,
+        Some(source),
         "Ready".to_owned(),
     )
+}
+
+fn tour() -> App {
+    App::new(
+        MathRenderer::new(),
+        Picker::halfblocks(),
+        None,
+        "Ready".to_owned(),
+    )
+}
+
+#[test]
+fn tour_startup_navigation_and_presets_cover_all_scenes() {
+    let mut app = tour();
+    assert_eq!(app.mode, Mode::Tour);
+    assert_eq!(app.options.text_size_pt, 18.0);
+    for (index, scene) in SCENES.iter().enumerate() {
+        assert_eq!(app.scene_index(), Some(index));
+        assert_eq!(app.source, EXAMPLES[scene.example].source);
+        assert!(app.context == scene.context);
+        assert_eq!(app.options.foreground, PALETTES[scene.palette].1);
+        assert_eq!(app.options.background, PALETTES[scene.palette].2);
+        assert_eq!(app.rendered.is_some(), EXAMPLES[scene.example].valid);
+        assert!(app.options.transparent_background);
+        key(&mut app, KeyCode::Right);
+    }
+    assert_eq!(app.scene_index(), Some(0));
+    key(&mut app, KeyCode::Left);
+    assert_eq!(app.scene_index(), Some(SCENES.len() - 1));
+    key(&mut app, KeyCode::Char('e'));
+    assert_eq!(app.mode, Mode::Explorer);
+    assert!(app.focus == Focus::Editor);
+    app.editor = Editor::new("α + beta");
+    key(&mut app, KeyCode::Enter);
+    assert!(app.rendered.is_some());
+    key(&mut app, KeyCode::Char('x'));
+    assert_eq!(app.mode, Mode::Tour);
+    assert_eq!(app.scene_index(), None);
+    key(&mut app, KeyCode::Char('n'));
+    assert_eq!(app.scene_index(), Some(0));
+}
+
+#[test]
+fn switching_modes_preserves_source_and_settings_and_controls_open_the_explorer() {
+    let mut app = app(EXAMPLES[0].source);
+    assert_eq!(app.mode, Mode::Explorer);
+    assert_eq!(app.options.text_size_pt, 12.0);
+    key(&mut app, KeyCode::Tab);
+    key(&mut app, KeyCode::Right);
+    let size = app.options.text_size_pt;
+    let pixels = app.rendered.as_ref().unwrap().image().clone();
+    key(&mut app, KeyCode::Char('x'));
+    assert_eq!(app.mode, Mode::Tour);
+    assert_eq!(app.source, EXAMPLES[0].source);
+    assert_eq!(app.options.text_size_pt, size);
+    assert_eq!(app.rendered.as_ref().unwrap().image(), &pixels);
+    key(&mut app, KeyCode::Tab);
+    assert_eq!(app.mode, Mode::Explorer);
+    assert!(app.focus == Focus::Settings);
+    key(&mut app, KeyCode::Char('x'));
+    key(&mut app, KeyCode::Char('r'));
+    assert_eq!(app.options.text_size_pt, 18.0);
+    assert_eq!(app.options.padding_pt, 4.0);
+}
+
+#[test]
+fn tour_layouts_keep_source_and_native_text_visible_across_scenes_and_resizes() {
+    let mut app = tour();
+    let mut terminal = Terminal::new(TestBackend::new(120, 40)).unwrap();
+    for _ in SCENES {
+        for (width, height) in [
+            (120, 40),
+            (100, 30),
+            (99, 30),
+            (100, 29),
+            (76, 24),
+            (20, 6),
+            (0, 0),
+        ] {
+            let area = Rect::new(0, 0, width, height);
+            terminal.backend_mut().resize(width, height);
+            terminal.resize(area).unwrap();
+            let equation = ui::equation_area(area, &app);
+            app.prepare(equation);
+            terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+            let buffer = terminal.backend().buffer();
+            let text = buffer
+                .content
+                .iter()
+                .map(|cell| cell.symbol())
+                .collect::<String>();
+            if width < 76 || height < 24 {
+                if width > 0 && height > 0 {
+                    assert!(text.contains("Enlarge"));
+                }
+                continue;
+            }
+            assert!(text.contains("GUIDED TOUR"));
+            assert!(text.contains("TYPST SOURCE"));
+            assert!(
+                text.contains(
+                    app.source
+                        .lines()
+                        .next()
+                        .unwrap()
+                        .split_whitespace()
+                        .next()
+                        .unwrap()
+                )
+            );
+            assert_eq!(text.contains("THE TOUR"), width >= 100 && height >= 30);
+            let source = ratatui::widgets::Block::bordered().inner(crate::tour::areas(area).source);
+            let displayed_source = (source.y..source.bottom())
+                .flat_map(|y| (source.x..source.right()).map(move |x| buffer[(x, y)].symbol()))
+                .collect::<String>();
+            let compact = |text: &str| {
+                text.chars()
+                    .filter(|character| !character.is_whitespace())
+                    .collect::<String>()
+            };
+            assert_eq!(compact(&displayed_source), compact(&app.source));
+            let content =
+                ratatui::widgets::Block::bordered().inner(crate::tour::areas(area).preview);
+            let context = preview::areas(content, &app);
+            assert!(context.before.bottom() <= equation.y);
+            assert!(equation.bottom() <= context.after.y);
+            assert!(context.after.bottom() <= content.bottom());
+            let image_cells = buffer
+                .content
+                .iter()
+                .filter(|cell| cell.symbol() == "▀")
+                .count();
+            assert_eq!(image_cells > 0, app.rendered.is_some());
+            if app.rendered.is_some() {
+                assert!(
+                    equation.height >= 3,
+                    "preview too short at {width}x{height}"
+                );
+            }
+            for y in 0..height {
+                for x in 0..width {
+                    if buffer[(x, y)].symbol() == "▀" {
+                        assert!(equation.contains((x, y).into()));
+                    }
+                }
+            }
+            if app.error.is_some() {
+                assert!(text.contains("2:1:"));
+                assert!(text.contains("Preview unavailable"));
+            }
+        }
+        key(&mut app, KeyCode::Down);
+    }
+    key(&mut app, KeyCode::Char('x'));
+    let area = Rect::new(0, 0, 100, 30);
+    terminal.backend_mut().resize(100, 30);
+    terminal.resize(area).unwrap();
+    app.prepare(ui::equation_area(area, &app));
+    terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+    assert!(
+        terminal
+            .backend()
+            .buffer()
+            .content
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>()
+            .contains("Examples")
+    );
+}
+
+#[test]
+fn command_line_keeps_existing_exports_and_rejects_conflicting_showcase_arguments() {
+    fn parse(args: &[&str]) -> anyhow::Result<crate::Args> {
+        crate::Args::parse(args.iter().map(|arg| (*arg).to_owned()))
+    }
+    assert!(parse(&[]).unwrap().source.is_none());
+    assert_eq!(parse(&["x^2"]).unwrap().source.as_deref(), Some("x^2"));
+    assert!(parse(&["--halfblocks", "--png", "out.png", "x^2"]).is_ok());
+    assert_eq!(
+        parse(&["--showcase-assets", "assets/demo"])
+            .unwrap()
+            .showcase_path
+            .as_deref(),
+        Some("assets/demo")
+    );
+    for args in [
+        vec!["--showcase-assets"],
+        vec!["--showcase-assets", "out", "x"],
+        vec!["--showcase-assets", "out", "--png", "out.png"],
+        vec!["--showcase-assets", "out", "--halfblocks"],
+        vec!["--showcase-assets", "--halfblocks"],
+        vec!["--unknown"],
+    ] {
+        assert!(parse(&args).is_err(), "{args:?}");
+    }
+}
+
+#[test]
+fn showcase_exports_opaque_images_and_reports_destination_errors() {
+    let directory =
+        std::env::temp_dir().join(format!("ratatui-typst-showcase-{}", std::process::id()));
+    std::fs::create_dir_all(&directory).unwrap();
+    let renderer = MathRenderer::new();
+    crate::export_showcase(&renderer, &directory).unwrap();
+    assert_eq!(
+        std::fs::read_dir(&directory).unwrap().count(),
+        crate::SHOWCASE_EXAMPLES.len()
+    );
+    for &(filename, _) in crate::SHOWCASE_EXAMPLES {
+        let image = image::open(directory.join(filename)).unwrap().to_rgba8();
+        assert!(image.width() > 0 && image.height() > 0);
+        assert!(image.pixels().all(|pixel| pixel.0[3] == 255));
+        assert_eq!(image.get_pixel(0, 0).0[..3], PALETTES[1].2);
+        assert!(image.pixels().any(|pixel| pixel.0[..3] != PALETTES[1].2));
+    }
+    let blocked = directory.join("quadratic.png").join("child");
+    let error = crate::export_showcase(&renderer, &blocked).unwrap_err();
+    assert!(format!("{error:#}").contains("Cannot create"));
+    for &(filename, _) in crate::SHOWCASE_EXAMPLES {
+        std::fs::remove_file(directory.join(filename)).unwrap();
+    }
+    std::fs::remove_dir(directory).unwrap();
 }
 
 fn key(app: &mut App, code: KeyCode) -> bool {
