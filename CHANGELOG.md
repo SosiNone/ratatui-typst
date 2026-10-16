@@ -8,6 +8,8 @@
 - Prepare fixed-size Ratatui equations using the application's shared image picker.
 - Expose fitted terminal dimensions through `PreparedEquation::size()`.
 - Bound natural rasters and whole-cell preparation canvases before allocation.
+- Disable Typst's `cite` and `bibliography` functions to prevent access to
+  transitive quick-xml denial-of-service vulnerabilities through inline CSL.
 - Include a public consumer example and reproducible terminal lifecycle checks.
 - Validate Linux rendering and terminal lifecycle on Ghostty 1.3.1 with Kitty
   graphics and the half-block fallback.

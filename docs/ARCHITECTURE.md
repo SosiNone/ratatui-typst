@@ -20,6 +20,8 @@ Typst math source + RenderOptions
 `MathRenderer` shares a lazily initialized bundled font set. Its restricted Typst
 world provides the generated equation source and standard library; filesystem,
 package resolution, system-font discovery, and the current date are unavailable.
+The global scope and `std` omit `cite` and `bibliography` to block untrusted CSL
+parsing; see the [dependency advisory review](SECURITY_REVIEW.md).
 The source is math without surrounding dollar delimiters, wrapped in an
 automatically sized Typst page with configured text size, padding, and colors.
 

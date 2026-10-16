@@ -16,6 +16,10 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [x] Adopt MIT for project code and include the complete license text.
 - [x] Record exact bundled-font terms and verify notice copies in the [license review](../licenses/REVIEW.md).
 - [x] Add a reproducible dependency inventory/notice collector.
+- [x] Review the locked dependency graph against the current RustSec database
+  and mitigate actionable findings; see the [advisory review](SECURITY_REVIEW.md)
+  for two retained quick-xml matches and six upstream maintenance warnings.
+  The license inventory is separate from this advisory check.
 - [x] Set repository URL, README, discovery metadata, and package file boundaries.
 - [x] Add changelog, consumer CI check, and local crate archive verification.
 - [x] Consolidate the library, demo, and tools into one workspace with a shared
@@ -37,9 +41,6 @@ Repository: https://github.com/SosiNone/ratatui-typst.
   tests and public consumer. Historical CI results below cover earlier revisions.
 - [ ] Confirm the desired crates.io name is still available and configure the
   publishing account/ownership immediately before publishing.
-- [ ] Review the locked dependency graph against the current RustSec database
-  (for example, `cargo audit --file Cargo.lock`) and resolve actionable findings.
-  The license inventory is separate from an advisory check.
 - [ ] Set a release date in [CHANGELOG.md](../CHANGELOG.md), update the README's
   candidate wording and local path dependency to the published version, and
   explicitly enable publishing after those gates pass. `publish = false` is
@@ -58,6 +59,31 @@ Kitty graphics are validated on Ghostty 1.3.1 on Linux. Other terminal
 implementations and multiplexers have no compatibility guarantee.
 A binary download would require an additional
 dependency-notice review; none is planned here.
+
+## Dependency advisory review (2026-10-16)
+
+`cargo-audit 0.22.2` checked all 447 locked workspace packages against a freshly
+fetched RustSec database at `479c888ce4401313bca61ba4aba2d0f6244c4a09`.
+It found two quick-xml vulnerabilities and six unmaintained dependencies, with
+no yanked-crate warnings. No compatible published dependency update fixes the
+vulnerable `quick-xml 0.38.4` required by citationberg.
+
+The equation renderer now removes `cite` and `bibliography` from both the global
+scope and `std`, blocking CSL parsing from inline bytes, including through
+`eval` and set rules. A regression test first reproduced the exposed parsing
+path and then passed with the restriction. This changes accepted Typst
+expressions without changing the Rust API or dependency versions.
+
+`task check` passed on Windows Rust/Cargo 1.93.0, including 24 workspace tests,
+one doctest, consumer smoke, and docs with warnings denied. Offline packaging
+with `--allow-dirty` passed, as did the extracted crate's 10 tests, doctest, and
+public consumer smoke without the workspace demo.
+
+The raw audit still reports the two mitigated matches and exits with status 1;
+no advisory ignores were added. The [advisory review](SECURITY_REVIEW.md) records
+the dependency paths, maintenance dispositions, database revision, and lockfile
+hash. Re-audit before publishing and reconsider the mitigation on dependency
+upgrades. Publishing remains disabled.
 
 ## Cleanup review (2026-10-16)
 
@@ -88,8 +114,9 @@ to avoid sandbox hard-link warnings. Packaging was offline against cached
 dependencies and produced a source archive of approximately 410 KiB compressed.
 
 No new real-terminal graphics session, remote CI run, or Rust 1.92 run was
-performed here. `cargo-audit` was not installed, and a fresh crates.io name
-lookup was unavailable from this environment. Those release gates remain open.
+performed in this cleanup review. `cargo-audit` was not installed at that point;
+the subsequent advisory review is recorded above. A fresh crates.io name lookup
+was unavailable during cleanup; that release gate remains open.
 A Windows real-terminal visual check of the diagnostic wrapping change is
 optional follow-up using [TERMINAL_TESTS.md](TERMINAL_TESTS.md). Publishing remains
 disabled.
@@ -165,7 +192,13 @@ cargo package --locked -p ratatui-typst
 cargo test --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target
 cargo run --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target --example terminal -- --smoke
 python tools/release_inventory.py --output target/release-licenses
+cargo audit --file Cargo.lock
 ```
+
+Install cargo-audit separately as described in the
+[advisory review](SECURITY_REVIEW.md). The raw audit currently exits with status 1
+for two mitigated upstream matches; review its findings against that record
+and investigate every new advisory before publishing.
 
 Inspect the archive for sources, tests, example, license, font notices, and
 release docs. It must not contain the workspace demo, development tools, generated

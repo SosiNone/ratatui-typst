@@ -5,7 +5,7 @@ use ratatui::layout::Size;
 use typst::{
     Library, LibraryExt, World, WorldExt,
     diag::{FileError, FileResult, SourceDiagnostic},
-    foundations::{Bytes, Datetime, Duration},
+    foundations::{Binding, Bytes, Datetime, Duration, Scope},
     syntax::{FileId, Source},
     text::{Font, FontBook},
     utils::{LazyHash, Scalar},
@@ -118,7 +118,9 @@ static FONTS: LazyLock<Fonts> = LazyLock::new(|| {
 
 /// Reusable synchronous compiler with bundled fonts and no system-font lookup.
 ///
-/// File imports, package downloads, and the current date are unavailable.
+/// File imports, package downloads, the current date, and the `cite` and
+/// `bibliography` functions (including through `std` and `eval`) are unavailable.
+/// Citation functions are disabled to block vulnerable transitive CSL parsing.
 /// Typst evaluation can still consume substantial CPU/memory: this is not a
 /// resource sandbox for hostile expressions. Use a separate process for those.
 pub struct MathRenderer {
@@ -134,8 +136,19 @@ impl Default for MathRenderer {
 
 impl MathRenderer {
     pub fn new() -> Self {
+        let mut library = Library::default();
+        let mut scope = Scope::new();
+        // Inline CSL bytes bypass World::file. Block both entry points until
+        // citationberg updates quick-xml (RUSTSEC-2026-0194 / RUSTSEC-2026-0195).
+        for (name, binding) in library.global.scope().iter() {
+            if !matches!(name.as_str(), "cite" | "bibliography") {
+                scope.bind(name.clone(), binding.clone());
+            }
+        }
+        library.global = library.global.with_scope(scope);
+        library.std = Binding::detached(library.global.clone());
         Self {
-            library: LazyHash::new(Library::default()),
+            library: LazyHash::new(library),
             fonts: &FONTS,
         }
     }

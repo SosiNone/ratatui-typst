@@ -162,6 +162,9 @@ PNG output from `image()` retains its original alpha.
   keep the source available to users.
 - File/package resolution and the current date are unavailable. This does not
   bound Typst evaluation time or memory for hostile input.
+- Typst's `cite` and `bibliography` functions are unavailable, including through
+  `std` and `eval`, to block vulnerable transitive CSL parsing. See the
+  [dependency advisory review](docs/SECURITY_REVIEW.md) for retained findings.
 - Raster output is capped at 16 megapixels and 16384 pixels per side. This
   check occurs after typesetting, so it is not a compiler resource limit.
   The same bounds apply to the whole-cell canvas allocated during preparation.

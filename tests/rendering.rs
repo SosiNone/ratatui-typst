@@ -163,6 +163,59 @@ fn controls_theme_scale_and_rejects_invalid_or_excessive_output() {
 }
 
 #[test]
+fn rejects_citation_parsers_before_loading_inline_csl() {
+    let renderer = MathRenderer::new();
+    for (expression, message) in [
+        (
+            r#"#cite(<missing>, style: bytes("<style/>"))"#,
+            "unknown variable: cite",
+        ),
+        (
+            r#"#bibliography(bytes(""), style: bytes("<style/>"))"#,
+            "unknown variable: bibliography",
+        ),
+        (
+            r#"#std.cite(<missing>, style: bytes("<style/>"))"#,
+            "does not contain `cite`",
+        ),
+        (
+            r#"#std.bibliography(bytes(""), style: bytes("<style/>"))"#,
+            "does not contain `bibliography`",
+        ),
+        (
+            r#"#eval("cite", mode: "code")(<missing>, style: bytes("<style/>"))"#,
+            "unknown variable: cite",
+        ),
+        (
+            r#"#eval("std.bibliography", mode: "code")(bytes(""), style: bytes("<style/>"))"#,
+            "does not contain `bibliography`",
+        ),
+        (
+            r#"x $ #set cite(style: bytes("<style/>"))
+            $ y"#,
+            "unknown variable: cite",
+        ),
+        (
+            r#"x $ #set std.bibliography(style: bytes("<style/>"))
+            $ y"#,
+            "does not contain `bibliography`",
+        ),
+    ] {
+        let RenderError::Compilation { diagnostics, .. } = renderer
+            .render(expression, &RenderOptions::default())
+            .err()
+            .expect("citation functions must be unavailable")
+        else {
+            panic!("expected compilation failure for {expression}")
+        };
+        assert!(
+            diagnostics.iter().any(|d| d.message.contains(message)),
+            "{expression}: {diagnostics:?}"
+        );
+    }
+}
+
+#[test]
 fn prepared_widget_composes_with_a_buffer_and_handles_empty_areas() {
     let renderer = MathRenderer::new();
     let equation = renderer
