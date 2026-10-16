@@ -1,11 +1,9 @@
 # First Public Release Preparation
 
-Target: **0.1.0**, source crate, with Windows Terminal as the initial terminal
-validation target. Status on **2026-10-11**: initial repository committed and
-pushed. The maintainer reports good Windows rendering and confirms the **Sixel**
-backend. Individual
-lifecycle checks still need recording. Kitty validation is deferred and does
-not block 0.1.0.
+Target: **0.1.0**, source crate. Status on **2026-10-16**: Ghostty 1.3.1 on Linux
+has passed real **Kitty** graphics and half-block lifecycle validation. The
+maintainer reports good Windows rendering and confirms the **Sixel** backend;
+individual Windows lifecycle checks still need recording.
 Repository: https://github.com/SosiNone/ratatui-typst.
 
 ## Completed preparation
@@ -25,6 +23,9 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [x] Review the candidate archive from the clean initial Git commit; verify
   the extracted library and its public consumer without the workspace demo.
 - [x] Pass workspace CI on Windows stable, Linux stable, and Linux Rust 1.92.
+- [x] Validate the public consumer and demo on Linux/Ghostty with Kitty graphics,
+  half-block fallback, resizing, transparency, and normal/Ctrl+C exit cleanup;
+  see the [Linux report](TERMINAL_TESTS.md#linux--ghostty-report-2026-10-16).
 - [x] Query crates.io: `ratatui-typst` returned HTTP 404 on 2026-10-11; no existing
   crate was returned. This does not reserve or guarantee the name.
 
@@ -38,12 +39,12 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [ ] Set a release date in [CHANGELOG.md](../CHANGELOG.md) and explicitly enable publishing after
   those gates pass. `publish = false` is intentionally retained for preparation.
 
-Kitty graphics remain available through ratatui-image but are unverified for
-0.1.0; a real Kitty report is follow-up work. Other terminals and multiplexers
-have no compatibility guarantee. A binary download would require an additional
+Kitty graphics are validated on Ghostty 1.3.1 on Linux. Other terminal
+implementations and multiplexers have no compatibility guarantee.
+A binary download would require an additional
 dependency-notice review; none is planned here.
 
-## Local validation
+## Local Windows validation (2026-10-11)
 
 Host: Windows, Rust/Cargo 1.93.0. These are local results, not remote CI evidence.
 
@@ -62,11 +63,27 @@ Host: Windows, Rust/Cargo 1.93.0. These are local results, not remote CI evidenc
 | Local crate packaging and extracted-source build | Passed, including the packaged consumer's headless check |
 | Interactive PTY | Half-block startup, placement, overlay, replacement/error, hide/show, alpha and clean exit |
 | Windows SIXEL rendering | Maintainer reports good visual results and confirms Sixel; individual lifecycle checks and exit cleanup unconfirmed |
-| Real Kitty | Not run; deferred beyond 0.1.0 |
+| Real Kitty | Not run in the original Windows session; later Linux/Ghostty results below |
 | Linux / Rust 1.92 | Passed remote CI; not run locally |
+
+The Kitty and Linux entries above describe the original Windows validation;
+the later local Linux results are recorded below.
 
 Installed Windows Terminal version: 1.24.12741.0. Confirm the version used in the
 manual report; the Sixel backend was confirmed separately by the maintainer.
+
+## Local Linux validation (2026-10-16)
+
+Host: Omarchy 4.0.4, Rust/Cargo 1.98.1, Ghostty 1.3.1-arch2, Kitty backend,
+19×42px cells, no multiplexer. The
+[terminal report](TERMINAL_TESTS.md#linux--ghostty-report-2026-10-16) includes
+the tested revision, interaction results, capture method, and screenshots.
+
+Formatting, workspace Clippy with warnings denied, all 22 workspace tests,
+the doctest, library/demo builds, the headless public consumer, and the library
+documentation build passed. Task was unavailable, so its `check` commands were
+run directly with Cargo. These are local results; no new remote CI run is claimed.
+No library, dependency, or public API changes were needed for this validation.
 
 ## Remote CI evidence
 

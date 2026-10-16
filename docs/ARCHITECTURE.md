@@ -70,9 +70,9 @@ terminal text. `examples/terminal.rs` is a smaller public API consumer for
 headless lifecycle tests and manual terminal checks. The crate archive excludes
 the demo and development tools.
 
-Windows Terminal/SIXEL is the initial terminal validation target. The maintainer
-reports good Windows rendering with Sixel confirmed; detailed lifecycle checks
-remain unconfirmed. Kitty validation is deferred beyond 0.1.0. Follow the
+Ghostty 1.3.1 on Linux has passed Kitty rendering and lifecycle validation.
+The maintainer reports good Windows rendering with Sixel confirmed; detailed
+Windows lifecycle checks remain unconfirmed. Follow the
 [terminal procedure](TERMINAL_TESTS.md); buffer tests and PNG exports cannot
 establish actual graphics cleanup or compatibility with multiplexers.
 

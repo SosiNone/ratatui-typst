@@ -51,5 +51,8 @@ Integration tests check fitted dimensions and excessive/invalid cell sizes.
 These validate public usage and buffer composition; they do not prove real
 graphics cleanup, visual quality, or hardware/terminal compatibility.
 
-Retain the small API for 0.1.0. Run the terminal procedure before claiming Kitty
-or SIXEL support; expand this interface only when a consumer demonstrates a need.
+The [Ghostty/Kitty Linux report](TERMINAL_TESTS.md#linux--ghostty-report-2026-10-16)
+also validates the consumer in a real graphics terminal, without API changes.
+Retain the small API for 0.1.0. Run the terminal procedure before claiming support
+for additional terminals; expand this interface only when a consumer demonstrates
+a need.

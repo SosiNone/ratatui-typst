@@ -38,10 +38,12 @@ Use **n / p or arrows** to navigate scenes, **x** to switch tour / explorer,
 **e** to edit, **Tab** for rendering controls, and **c** to compare Note / Console /
 Plain contexts. **s** saves a PNG; **q** quits. Enter compiles an edit; Esc cancels it.
 
-Graphics detection runs once at startup. Windows Terminal with SIXEL is the
-initial validation target; detection failures fall back to half-block characters.
-PowerShell is a shell, so graphics support depends on its terminal host.
-Kitty is available through ratatui-image but remains unverified for 0.1.0.
+Graphics detection runs once at startup. **Ghostty 1.3.1 on Linux is validated
+with Kitty graphics**, including resizing, transparency, replacement, and exit
+cleanup. The demo falls back to half-block characters if detection fails.
+Windows Terminal has a positive SIXEL rendering report; its full lifecycle
+validation remains pending. PowerShell is a shell, so graphics support depends
+on its terminal host. Other terminals and multiplexers remain unverified.
 See the [terminal validation procedure](docs/TERMINAL_TESTS.md) for current evidence.
 
 ## Rendered examples
@@ -165,8 +167,9 @@ PNG output from `image()` retains its original alpha.
   default bundle are pending.
 - Typst's process-wide memoization cache is aged after each compilation; there
   is no byte-bounded equation cache or asynchronous stale-result handling yet.
-- The Windows Terminal lifecycle report is pending completion; Kitty validation
-  is deferred beyond 0.1.0. Buffer tests cannot establish real graphics behavior.
+- Real graphics validation covers Ghostty 1.3.1 on Linux. The Windows Terminal
+  lifecycle report is pending completion. Buffer tests cannot establish real
+  graphics behavior or compatibility with other terminals and multiplexers.
 
 Project code is licensed under [MIT](LICENSE), copyright 2026 ratatui-typst
 contributors. Bundled dependencies and fonts retain their own licenses;

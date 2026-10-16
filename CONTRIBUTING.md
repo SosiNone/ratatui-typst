@@ -55,10 +55,11 @@ source expression and commands to reproduce the result. Check:
 5. Exiting normally and verifying no graphics remain.
 
 Use [docs/TERMINAL_TESTS.md](docs/TERMINAL_TESTS.md) for an exact key sequence and
-report template. Windows rendering has a positive maintainer report with Sixel
-confirmed; individual lifecycle checks remain unconfirmed. Kitty validation is
-deferred beyond 0.1.0. Keep limitations visible until verified. Screenshot
-comparisons are useful evidence, but record the interaction steps too.
+report template and the completed Ghostty/Kitty Linux report. Windows rendering
+has a positive maintainer report with Sixel confirmed; its individual lifecycle
+checks remain unconfirmed. Keep limitations for other terminals and multiplexers
+visible until verified. Screenshot comparisons are useful evidence, but record
+the interaction steps too.
 
 ## Commits and pull requests
 

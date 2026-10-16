@@ -109,9 +109,12 @@ resizing and leaves clear pixels undrawn. Half-blocks use an opaque composite.
 The demo enables Ratatui's `unstable-rendered-line-info` feature to measure
 wrapped paragraphs consistently when reserving their space.
 
-The maintainer reports good Windows rendering with the Sixel backend confirmed.
-Detailed lifecycle checks remain unconfirmed; Kitty validation is deferred
-beyond 0.1.0. Review background continuity, text size, spacing, palette changes,
+Ghostty 1.3.1 on Linux has passed Kitty graphics validation, including the tour,
+editing, rendering controls, backend switching, and exit cleanup. See the
+[Linux report and captures](../docs/TERMINAL_TESTS.md#linux--ghostty-report-2026-10-16).
+The maintainer reports good Windows rendering with the Sixel backend confirmed;
+detailed Windows lifecycle checks remain unconfirmed.
+Review background continuity, text size, spacing, palette changes,
 replacement, resizing, compiler errors, and exit cleanup. Follow the
 [terminal procedure](../docs/TERMINAL_TESTS.md) using the smaller public example.
 Buffer tests and exported PNGs do not establish terminal behavior.
@@ -149,7 +152,9 @@ window using the matrix example; its controls, source, note text, and image were
 readable together.
 Those PTY results do not establish SIXEL or Kitty cleanup. Real SIXEL resizing,
 replacement, movement, errors, palette changes, and exit cleanup still require
-the [full terminal procedure](../docs/TERMINAL_TESTS.md); Kitty remains unverified.
+the [full terminal procedure](../docs/TERMINAL_TESTS.md).
+Kitty was unverified at the time of this Windows capture; the later Linux report
+above records Ghostty validation.
 
 ## Checks
 
