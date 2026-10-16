@@ -44,7 +44,7 @@ Graphics detection runs once at startup. **Ghostty 1.3.1 on Linux is validated
 with Kitty graphics**, including resizing, transparency, replacement, and exit
 cleanup. The demo falls back to half-block characters if detection fails.
 Windows Terminal has a positive SIXEL rendering report; its full lifecycle
-validation remains pending. PowerShell is a shell, so graphics support depends
+validation remains unverified. PowerShell is a shell, so graphics support depends
 on its terminal host. Other terminals and multiplexers remain unverified.
 See the [terminal validation procedure](docs/TERMINAL_TESTS.md) for current evidence.
 
@@ -169,8 +169,8 @@ PNG output from `image()` retains its original alpha.
   default bundle are pending.
 - Typst's process-wide memoization cache is aged after each compilation; there
   is no byte-bounded equation cache or asynchronous stale-result handling yet.
-- Real graphics validation covers Ghostty 1.3.1 on Linux. The Windows Terminal
-  lifecycle report is pending completion. Buffer tests cannot establish real
+- Real graphics validation covers Ghostty 1.3.1 on Linux. Windows Terminal
+  lifecycle behavior remains unverified. Buffer tests cannot establish real
   graphics behavior or compatibility with other terminals and multiplexers.
 
 Project code is licensed under [MIT](LICENSE), copyright 2026 ratatui-typst

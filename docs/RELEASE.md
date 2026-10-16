@@ -3,7 +3,8 @@
 Target: **0.1.0**, source crate. Status on **2026-10-16**: Ghostty 1.3.1 on Linux
 has passed real **Kitty** graphics and half-block lifecycle validation. The
 maintainer reports good Windows rendering and confirms the **Sixel** backend;
-individual Windows lifecycle checks still need recording.
+individual Windows lifecycle checks remain unverified and are optional follow-up
+for 0.1.0.
 Repository: https://github.com/SosiNone/ratatui-typst.
 
 ## Completed preparation
@@ -34,9 +35,6 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [ ] Commit the final candidate and pass CI on that exact revision (Windows
   stable, Linux stable, and Linux Rust 1.92), including the extracted crate's
   tests and public consumer. Historical CI results below cover earlier revisions.
-- [ ] Finalize the Windows Terminal report using [TERMINAL_TESTS.md](TERMINAL_TESTS.md),
-  recording completed lifecycle checks and exit cleanup. The maintainer has
-  confirmed Sixel as the detected backend and reported good visual rendering.
 - [ ] Confirm the desired crates.io name is still available and configure the
   publishing account/ownership immediately before publishing.
 - [ ] Review the locked dependency graph against the current RustSec database
@@ -49,6 +47,12 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 - [ ] Inspect the final archive and run `cargo publish --dry-run --locked` after
   publishing is enabled. Publish only with the owner's authorization, then tag
   the published revision `v0.1.0` and verify the crates.io page and docs.rs build.
+
+Per the maintainer's decision on 2026-10-16, the full Windows Terminal/SIXEL
+lifecycle report is optional follow-up, not a 0.1.0 release gate. Basic rendering
+has a positive report with Sixel confirmed; individual lifecycle steps and exit
+cleanup remain unverified. Use [TERMINAL_TESTS.md](TERMINAL_TESTS.md) for any future
+validation.
 
 Kitty graphics are validated on Ghostty 1.3.1 on Linux. Other terminal
 implementations and multiplexers have no compatibility guarantee.
@@ -86,8 +90,9 @@ dependencies and produced a source archive of approximately 410 KiB compressed.
 No new real-terminal graphics session, remote CI run, or Rust 1.92 run was
 performed here. `cargo-audit` was not installed, and a fresh crates.io name
 lookup was unavailable from this environment. Those release gates remain open.
-The diagnostic wrapping change still needs a real-terminal visual check using
-the procedure in [TERMINAL_TESTS.md](TERMINAL_TESTS.md). Publishing remains disabled.
+A Windows real-terminal visual check of the diagnostic wrapping change is
+optional follow-up using [TERMINAL_TESTS.md](TERMINAL_TESTS.md). Publishing remains
+disabled.
 
 ## Local Windows validation (2026-10-11)
 
@@ -114,8 +119,8 @@ Host: Windows, Rust/Cargo 1.93.0. These are local results, not remote CI evidenc
 The Kitty and Linux entries above describe the original Windows validation;
 the later local Linux results are recorded below.
 
-Installed Windows Terminal version: 1.24.12741.0. Confirm the version used in the
-manual report; the Sixel backend was confirmed separately by the maintainer.
+Installed Windows Terminal version: 1.24.12741.0. The tested terminal version was
+not recorded; the Sixel backend was confirmed separately by the maintainer.
 
 ## Local Linux validation (2026-10-16)
 
@@ -143,7 +148,7 @@ checks the same library/demo sources on all three targets:
 
 Each job checks formatting, workspace Clippy/tests, the public consumer smoke
 sequence, demo PNG export, library documentation, and standalone crate packaging.
-These headless checks do not complete the manual SIXEL lifecycle report.
+These headless checks do not establish real SIXEL lifecycle behavior.
 
 ## Reproduce before publishing
 

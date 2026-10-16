@@ -6,8 +6,10 @@ Run from the library repository root:
 cargo run --locked --example terminal
 ```
 
-Ghostty 1.3.1 on Linux has passed the Kitty procedure below. Windows Terminal
-remains the SIXEL validation target, with its full lifecycle report pending.
+Ghostty 1.3.1 on Linux has passed the Kitty procedure below. Full Windows
+Terminal/SIXEL lifecycle validation is optional follow-up, not a 0.1.0 release
+gate, per the maintainer's decision on 2026-10-16. Its lifecycle coverage and exit
+cleanup remain unverified.
 The example displays the selected backend and cell dimensions. If detection
 chooses Halfblocks, record a fallback result; do not count it as a graphics pass.
 The terminal's shell is not evidence of graphics support.
@@ -145,4 +147,5 @@ Bulk captures, terminal recordings, exit reports, and the temporary automation
 scripts are kept locally under ignored `output/linux-ghostty-2026-10-16/`.
 This report establishes the tested Ghostty configuration only. The Kitty terminal
 application, other Linux terminals, multiplexers, SSH, font zoom during execution,
-and Linux SIXEL were not tested. Windows lifecycle validation remains pending.
+and Linux SIXEL were not tested. Windows lifecycle validation remains unverified
+and is optional follow-up.

@@ -16,4 +16,4 @@
 Ghostty/Kitty lifecycle results are recorded in the
 [terminal report](docs/TERMINAL_TESTS.md#linux--ghostty-report-2026-10-16).
 Windows rendering is reported good with Sixel confirmed; detailed lifecycle
-results remain pending. See [the release checklist](docs/RELEASE.md).
+behavior remains unverified. See [the release checklist](docs/RELEASE.md).
