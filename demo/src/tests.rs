@@ -411,6 +411,34 @@ fn tui_draws_preview_diagnostics_editor_and_handles_resize() {
 }
 
 #[test]
+fn diagnostic_scrolling_keeps_unicode_intact_and_clamps_after_resize() {
+    let mut app = app("x");
+    app.rendered = None;
+    app.error = Some(format!("{}👩‍🔬{}", "a".repeat(50), "b".repeat(100)));
+    let mut terminal = Terminal::new(TestBackend::new(80, 24)).unwrap();
+    terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+    let text = terminal
+        .backend()
+        .buffer()
+        .content
+        .iter()
+        .map(|cell| cell.symbol())
+        .collect::<String>();
+    assert!(text.contains("👩‍🔬"));
+    app.diagnostic_scroll = u16::MAX;
+    terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+    assert!(app.diagnostic_scroll > 0 && app.diagnostic_scroll < u16::MAX);
+    let narrow_scroll = app.diagnostic_scroll;
+    terminal.backend_mut().resize(120, 40);
+    terminal.resize(Rect::new(0, 0, 120, 40)).unwrap();
+    terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+    assert!(app.diagnostic_scroll < narrow_scroll);
+    app.error = None;
+    terminal.draw(|frame| ui::draw(frame, &mut app)).unwrap();
+    assert_eq!(app.diagnostic_scroll, 0);
+}
+
+#[test]
 fn contextual_previews_keep_native_text_clear_of_the_image_and_match_its_palette() {
     let mut app = app(EXAMPLES[0].source);
     let mut terminal = Terminal::new(TestBackend::new(80, 24)).unwrap();

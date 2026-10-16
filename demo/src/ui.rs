@@ -246,10 +246,10 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             }),
         )
     }));
-    // Wrap explicitly so scrolling is bounded without Ratatui's unstable line-count API.
-    let lines = wrap_lines(lines, a.details.inner.width);
-    let max_scroll = lines.len().saturating_sub(a.details.inner.height as usize);
-    let paragraph = Paragraph::new(lines);
+    let paragraph = Paragraph::new(lines).wrap(Wrap { trim: false });
+    let max_scroll = paragraph
+        .line_count(a.details.inner.width)
+        .saturating_sub(usize::from(a.details.inner.height));
     app.diagnostic_scroll = app
         .diagnostic_scroll
         .min(max_scroll.min(u16::MAX as usize) as u16);
@@ -272,23 +272,4 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         ]),
         a.footer,
     );
-}
-
-fn wrap_lines(lines: Vec<Line<'static>>, width: u16) -> Vec<Line<'static>> {
-    let mut wrapped = Vec::new();
-    for line in lines {
-        let mut text = String::new();
-        let mut used = 0;
-        for character in line.spans.iter().flat_map(|span| span.content.chars()) {
-            let size = Line::from(character.to_string()).width();
-            if used + size > usize::from(width) && !text.is_empty() {
-                wrapped.push(Line::from(std::mem::take(&mut text)).style(line.style));
-                used = 0;
-            }
-            text.push(character);
-            used += size;
-        }
-        wrapped.push(Line::from(text).style(line.style));
-    }
-    wrapped
 }

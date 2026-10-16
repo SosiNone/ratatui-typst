@@ -31,18 +31,63 @@ Repository: https://github.com/SosiNone/ratatui-typst.
 
 ## Remaining release gates
 
+- [ ] Commit the final candidate and pass CI on that exact revision (Windows
+  stable, Linux stable, and Linux Rust 1.92), including the extracted crate's
+  tests and public consumer. Historical CI results below cover earlier revisions.
 - [ ] Finalize the Windows Terminal report using [TERMINAL_TESTS.md](TERMINAL_TESTS.md),
   recording completed lifecycle checks and exit cleanup. The maintainer has
   confirmed Sixel as the detected backend and reported good visual rendering.
 - [ ] Confirm the desired crates.io name is still available and configure the
   publishing account/ownership immediately before publishing.
-- [ ] Set a release date in [CHANGELOG.md](../CHANGELOG.md) and explicitly enable publishing after
-  those gates pass. `publish = false` is intentionally retained for preparation.
+- [ ] Review the locked dependency graph against the current RustSec database
+  (for example, `cargo audit --file Cargo.lock`) and resolve actionable findings.
+  The license inventory is separate from an advisory check.
+- [ ] Set a release date in [CHANGELOG.md](../CHANGELOG.md), update the README's
+  candidate wording and local path dependency to the published version, and
+  explicitly enable publishing after those gates pass. `publish = false` is
+  intentionally retained for preparation; keep the demo unpublished.
+- [ ] Inspect the final archive and run `cargo publish --dry-run --locked` after
+  publishing is enabled. Publish only with the owner's authorization, then tag
+  the published revision `v0.1.0` and verify the crates.io page and docs.rs build.
 
 Kitty graphics are validated on Ghostty 1.3.1 on Linux. Other terminal
 implementations and multiplexers have no compatibility guarantee.
 A binary download would require an additional
 dependency-notice review; none is planned here.
+
+## Cleanup review (2026-10-16)
+
+Reviewed the library's render/prepare/draw path, demo, public consumer, tests,
+CI, package boundaries, and release/license documentation on Windows with
+Rust/Cargo 1.93.0, starting from `a75ea95` with a clean working tree.
+
+The cleanup replaces the demo's manual character wrapping with Ratatui's
+existing word/grapheme wrapper and removes redundant picker background setup;
+the library already handles canvas padding and compositing. A regression test
+covers Unicode diagnostics and scroll clamping after resize/recovery. README
+images and the excluded demo guide now use repository URLs. The public API,
+dependency versions, and font assets are unchanged. CI now tests the extracted
+crate and its public consumer without the demo's feature set.
+
+| Check on the cleanup working tree | Result |
+| --- | --- |
+| `task check` | Passed: formatting, workspace Clippy, 23 tests, 1 doctest, consumer smoke, and docs |
+| Rustdoc warnings denied | Passed with `RUSTDOCFLAGS=-D warnings` |
+| Offline, locked package verification | Passed with `--allow-dirty` for this uncommitted review |
+| Extracted crate tests and consumer | Passed: 9 tests, 1 doctest, and headless smoke in a separate target directory |
+| Dependency license inventory | 445 third-party packages; bundled Typst notices match; 31 missing notice files remain a binary-distribution collection gap |
+
+Rustdoc initially failed to write its executable in the sandbox's default
+temporary directory. Re-running with `TEMP` and `TMP` set to the workspace's
+`target/review-tmp` passed. Incremental compilation was disabled for these checks
+to avoid sandbox hard-link warnings. Packaging was offline against cached
+dependencies and produced a source archive of approximately 410 KiB compressed.
+
+No new real-terminal graphics session, remote CI run, or Rust 1.92 run was
+performed here. `cargo-audit` was not installed, and a fresh crates.io name
+lookup was unavailable from this environment. Those release gates remain open.
+The diagnostic wrapping change still needs a real-terminal visual check using
+the procedure in [TERMINAL_TESTS.md](TERMINAL_TESTS.md). Publishing remains disabled.
 
 ## Local Windows validation (2026-10-11)
 
@@ -112,6 +157,8 @@ cargo run --locked -p ratatui-typst --example terminal -- --smoke
 cargo doc --locked -p ratatui-typst --no-deps
 cargo package --locked -p ratatui-typst --list
 cargo package --locked -p ratatui-typst
+cargo test --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target
+cargo run --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target --example terminal -- --smoke
 python tools/release_inventory.py --output target/release-licenses
 ```
 

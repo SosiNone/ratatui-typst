@@ -193,7 +193,8 @@ impl MathRenderer {
             return Err(RenderError::Output("Expected exactly one equation page"));
         };
         let natural_size_pt = [page.frame.size().x.to_pt(), page.frame.size().y.to_pt()];
-        // Match the rasterizer's rounding before checking allocation limits.
+        // Conservatively round up before checking allocation limits.
+        // Typst's rasterizer rounds to the nearest pixel using f32 dimensions.
         let dimensions = natural_size_pt.map(|pt| (pt * options.pixels_per_pt).ceil().max(1.0));
         if dimensions
             .iter()

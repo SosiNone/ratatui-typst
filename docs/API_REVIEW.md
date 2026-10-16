@@ -22,8 +22,8 @@ demo files, or additional dependencies are required.
 - **Preparation allocation bounds:** reject oversized cell-padded canvases with
   `PrepareError::OutputTooLarge` before allocating pixels. Even a tiny equation
   could previously allocate an enormous canvas from a caller-supplied cell size.
-- **Raster rounding:** check rounded-up raster dimensions against the pixel
-  limits, matching the renderer's allocation rather than fractional dimensions.
+- **Raster rounding:** conservatively check rounded-up raster dimensions against
+  the pixel limits; Typst rounds to the nearest pixel when allocating its raster.
 - **Units:** document points, pixels per point, sRGB colors, straight alpha,
   padding, and the effect of raster scale on natural terminal dimensions.
 

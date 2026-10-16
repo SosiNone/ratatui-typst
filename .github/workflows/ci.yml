@@ -32,6 +32,10 @@ jobs:
       - run: cargo run --locked -p ratatui-typst-demo -- --png output/preview.png
       - run: cargo doc --locked -p ratatui-typst --no-deps
       - run: cargo package --locked -p ratatui-typst
+      - name: Test the extracted crate without the workspace demo
+        run: cargo test --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target
+      - name: Check the extracted public consumer
+        run: cargo run --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target --example terminal -- --smoke
       # Extracted sources are disposable and confuse build-cache pruning.
       - name: Remove package verification artifacts before caching
         if: always()

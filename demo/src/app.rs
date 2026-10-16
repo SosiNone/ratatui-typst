@@ -167,13 +167,6 @@ impl App {
         let Some(rendered) = &self.rendered else {
             return;
         };
-        let padding = if self.picker.protocol_type() == ProtocolType::Halfblocks {
-            let [r, g, b] = self.options.background;
-            image::Rgba([r, g, b, 255])
-        } else {
-            image::Rgba([0, 0, 0, 0])
-        };
-        self.picker.set_background_color(Some(padding));
         match rendered.prepare(&self.picker, size) {
             Ok(prepared) => self.prepared = Some(prepared),
             Err(error) => {

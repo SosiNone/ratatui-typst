@@ -8,11 +8,13 @@ This is an **unpublished 0.1.0 candidate** with a provisional API. The project a
 crate name is `ratatui-typst`; Rust imports use `ratatui_typst`.
 Repository: [SosiNone/ratatui-typst](https://github.com/SosiNone/ratatui-typst).
 
-![Guided tour showing the quadratic formula, terminal notebook text, scene navigation, and editable Typst source](assets/demo/terminal.png)
+![Guided tour showing the quadratic formula, terminal notebook text, scene navigation, and editable Typst source](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/terminal.png)
 
 The demo pairs typeset equations with ordinary terminal text. Take a six-scene
 tour, then switch to the explorer to edit math and tune rendering.
-See the [demo guide](demo/README.md) for screenshot details and controls.
+See the [demo guide](https://github.com/SosiNone/ratatui-typst/blob/main/demo/README.md)
+for screenshot details and controls. The demo is available in the Git repository;
+it is excluded from the library crate archive.
 
 ## Run the demo
 
@@ -54,12 +56,12 @@ typesetting output; they are separate from the terminal screenshot above.
 
 | Quadratic formula | Gaussian integral |
 | --- | --- |
-| ![Quadratic formula with plus or minus, a square root, and a fraction](assets/demo/quadratic.png) | ![Gaussian integral from zero to infinity equals square root of pi divided by two](assets/demo/integral.png) |
+| ![Quadratic formula with plus or minus, a square root, and a fraction](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/quadratic.png) | ![Gaussian integral from zero to infinity equals square root of pi divided by two](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/integral.png) |
 | `x = (-b plus.minus sqrt(b^2 - 4 a c)) / (2 a)` | `integral_0^infinity e^(-x^2) dif x = sqrt(pi) / 2` |
 
 | Matrix | Piecewise function |
 | --- | --- |
-| ![Two by two matrix A with rows one two and three four](assets/demo/matrix.png) | ![Absolute value defined as x for nonnegative x and minus x for negative x](assets/demo/piecewise.png) |
+| ![Two by two matrix A with rows one two and three four](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/matrix.png) | ![Absolute value defined as x for nonnegative x and minus x for negative x](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/piecewise.png) |
 | `A = mat(1, 2; 3, 4)` | `abs(x) = cases(x &"if " x >= 0, -x &"if " x < 0)` |
 
 Regenerate all four images from the same built-in examples:
