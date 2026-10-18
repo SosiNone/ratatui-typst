@@ -1,6 +1,6 @@
 # Contributing
 
-The project is an unpublished companion crate candidate. Read the
+The project is an experimental companion crate. Read the
 [architecture](docs/ARCHITECTURE.md) before extending scope and the
 [release checklist](docs/RELEASE.md) before preparing a release.
 The project and package name is `ratatui-typst`; the repository is
@@ -21,7 +21,9 @@ cargo package --locked -p ratatui-typst
 ```
 
 `task check` runs formatting, Clippy, tests, the headless consumer, and docs;
-`task package` verifies the crate archive. CI runs both sequences on stable Rust on
+`task package` verifies the crate archive, its tests, and its public consumer
+without the workspace demo. Documentation warnings are errors in both Task and
+CI. CI runs both sequences on stable Rust on
 Windows/Linux and Rust 1.92 on Linux. A workflow file is not evidence that those
 remote checks have passed; local verification is recorded separately.
 Commit the single root Cargo.lock so local checks and CI use the same dependency
@@ -31,6 +33,15 @@ or `task demo` for the explorer; `task previews` exports equations to ignored
 `output/`. The public `examples/terminal.rs` consumer and published library
 archive do not require the demo. Optional release inventory tooling requires
 Python 3.11+; see the [license review](licenses/REVIEW.md).
+
+Following Cargo's [CI guidance](https://doc.rust-lang.org/cargo/guide/continuous-integration.html#verifying-latest-dependencies),
+a separate Linux stable job runs `cargo update` before workspace tests and the
+public consumer smoke check. It tests the newest versions allowed by the
+manifests, with `CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS=allow` so the declared
+minimum Rust version does not restrict dependency selection. This job changes
+only its disposable checkout's lockfile; the locked Windows/Linux and Rust 1.92
+jobs continue to validate the committed graph. When upgrading the committed
+lockfile, review advisories and bundled font notices as described below.
 
 Keep `renderer.rs` independent of terminal detection and event handling.
 `widget.rs` adapts images to ratatui-image. The application owns its shared

@@ -1,6 +1,6 @@
 # License and Asset Review
 
-Reviewed on 2026-10-11 against the committed Cargo.lock and cached registry
+Reviewed on 2026-10-18 against the committed Cargo.lock and cached registry
 sources. Project code is [MIT licensed](../LICENSE), copyright 2026
 ratatui-typst contributors. Font and dependency licenses remain separate.
 
@@ -48,6 +48,9 @@ files. Fetch dependencies first if the registry cache is empty. The inventory
 covers the entire workspace graph, including the unpublished demo, build, and
 target-only dependencies; it is broader than the library's production graph.
 Use the generated inventory for current package counts and missing notice texts.
+The 2026-10-18 inventory contains 445 third-party packages and 31 missing notice
+files; both bundled Typst notice copies still match. The lockfile SHA-256 is
+`67c85cc4f94b3bb39b44c673a5144d3cedce697de7e8aefcfae3f9702070353b`.
 A missing filename-scan result is a collection gap, not a determination that a
 package is unlicensed. Adding the demo to the workspace changes the lockfile
 and graph scope without changing the original font notice copies.

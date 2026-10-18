@@ -1,6 +1,6 @@
 # Locked dependency advisory review
 
-Reviewed on **2026-10-16** with `cargo-audit 0.22.2` on Windows. The official
+Reviewed on **2026-10-18** with `cargo-audit 0.22.2` on Windows. The official
 RustSec Windows release archive was verified against its published SHA-256.
 This review is separate from the [license inventory](../licenses/REVIEW.md).
 
@@ -10,9 +10,9 @@ This review is separate from the [license inventory](../licenses/REVIEW.md).
   and all build, demo, and target-specific dependencies.
 - Lockfile SHA-256:
   `67c85cc4f94b3bb39b44c673a5144d3cedce697de7e8aefcfae3f9702070353b`.
-- Freshly fetched [RustSec database](https://github.com/RustSec/advisory-db/tree/479c888ce4401313bca61ba4aba2d0f6244c4a09):
-  1,329 advisories at commit `479c888ce4401313bca61ba4aba2d0f6244c4a09`,
-  updated `2026-10-16T08:29:44+02:00`.
+- Freshly fetched [RustSec database](https://github.com/RustSec/advisory-db/tree/999ec89d5d3f10f20be14750ec8c2d8b44e0ac9b):
+  1,338 advisories at commit `999ec89d5d3f10f20be14750ec8c2d8b44e0ac9b`,
+  updated `2026-10-17T17:23:59+02:00`.
 - No advisory ignores, target filters, stale-database allowance, or disabled
   yanked-crate checks were used.
 
@@ -36,7 +36,7 @@ The separate `quick-xml 0.42.0` dependency through `plist` is already patched.
 RustSec requires `quick-xml >=0.41.0` for both fixes. The current published
 `citationberg 0.7.0` requires `quick-xml ^0.38.1`, so a lockfile-only update
 cannot select a fixed version. crates.io checks found no newer published
-`citationberg`, `hayagriva`, or Typst release on the review date.
+`citationberg`, `hayagriva`, or Typst release on 2026-10-18.
 
 File-access restrictions alone do **not** mitigate these advisories. Typst's
 [`cite` style parser](https://docs.rs/typst-library/0.15.1/src/typst_library/model/cite.rs.html)
@@ -84,14 +84,18 @@ incremental compilation disabled, and `TEMP`/`TMP` inside `target/review-tmp`.
 
 | Check | Result |
 | --- | --- |
-| Citation regression before the mitigation | Failed as expected: inline CSL reached the parser and reported `failed to load CSL style` |
+| Citation regression before the mitigation (2026-10-16) | Failed as expected: inline CSL reached the parser and reported `failed to load CSL style` |
 | `task check` after the mitigation | Passed: formatting, workspace Clippy with warnings denied, 24 tests, 1 doctest, consumer smoke, and docs with `RUSTDOCFLAGS=-D warnings` |
 | `cargo package --locked --offline --allow-dirty -p ratatui-typst` | Passed: source archive built and extracted library compiled |
 | Extracted crate without the workspace demo | Passed: 10 tests, 1 doctest, and public consumer smoke, including the citation regression |
 | Final audit with a fresh database fetch | Same two mitigated vulnerability matches and six maintenance warnings; exit 1, no ignores |
 
-The archive check used `--allow-dirty` for this uncommitted review. No new remote
-CI, Rust 1.92, or real-terminal validation is claimed. Publishing remains disabled.
+The initial archive check used `--allow-dirty` during preparation. The fresh
+audit retained exactly the two vulnerability matches and six maintenance warnings
+documented here; no advisory ignores were added. The machine-readable report is
+kept locally at `target/release-prep/audit/audit.json`. See the
+[release checklist](RELEASE.md) for candidate CI and final archive verification.
+No new real-terminal validation is claimed. Publishing remains disabled.
 
 ## Reproduce
 

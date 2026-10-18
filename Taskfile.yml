@@ -8,6 +8,8 @@ vars:
 tasks:
   check:
     desc: Check the library and demo workspace
+    env:
+      RUSTDOCFLAGS: '-D warnings'
     cmds:
       - cargo fmt --all -- --check
       - cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -22,9 +24,11 @@ tasks:
       - cargo run --locked -p ratatui-typst --example terminal -- {{.CLI_ARGS}}
 
   package:
-    desc: Build and verify the library archive without publishing
+    desc: Verify the library archive, tests, and public consumer without publishing
     cmds:
       - cargo package --locked -p ratatui-typst
+      - cargo test --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target
+      - cargo run --locked --manifest-path target/package/ratatui-typst-0.1.0/Cargo.toml --target-dir target --example terminal -- --smoke
 
   default:
     desc: List the available examples
