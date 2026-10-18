@@ -15,7 +15,7 @@ include = [
     "/Cargo.toml", "/Cargo.lock", "/README.md", "/CHANGELOG.md",
     "/CONTRIBUTING.md", "/LICENSE",
 ]
-publish = false
+publish = ["crates-io"]
 
 [workspace]
 members = ["demo"]

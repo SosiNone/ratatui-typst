@@ -2,7 +2,9 @@
 
 Planned release date: **2026-10-18**. This is a source-crate release.
 Repository: [SosiNone/ratatui-typst](https://github.com/SosiNone/ratatui-typst).
-Publishing remains disabled in both manifests until the owner authorizes it.
+The owner has authorized enabling library publication to crates.io. The demo
+remains unpublished. The final commit must pass CI before the publish command
+is run; enabling publication does not itself upload the crate.
 
 ## Candidate preparation (2026-10-18)
 

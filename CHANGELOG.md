@@ -2,7 +2,7 @@
 
 ## 0.1.0 (2026-10-18)
 
-Planned first release; publication is pending owner authorization.
+First release.
 
 - Typeset block math with embedded Typst 0.15.1 and bundled fonts.
 - Configure size, padding, raster scale, foreground, background, and transparency.

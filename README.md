@@ -6,8 +6,6 @@ executable, LaTeX installation, or PNG round trip is needed to display math.
 
 Version **0.1.0** has a provisional API. The project and crate name is
 `ratatui-typst`; Rust imports use `ratatui_typst`.
-The first release is planned for **2026-10-18**; publication is pending owner
-authorization. See the [release checklist](docs/RELEASE.md).
 Repository: [SosiNone/ratatui-typst](https://github.com/SosiNone/ratatui-typst).
 
 ![Guided tour showing the quadratic formula, terminal notebook text, scene navigation, and editable Typst source](https://raw.githubusercontent.com/SosiNone/ratatui-typst/main/assets/demo/terminal.png)
@@ -104,7 +102,7 @@ and [API review](docs/API_REVIEW.md).
 ## Library use
 
 [src/lib.rs](src/lib.rs) is the public library entry point. Supply Typst math
-without `$` delimiters. After publication, add these dependencies:
+without `$` delimiters. Add these dependencies:
 
 ```toml
 [dependencies]
@@ -112,10 +110,6 @@ ratatui-typst = "0.1.0"
 ratatui = "0.30.2"
 ratatui-image = { version = "11.1", default-features = false, features = ["crossterm"] }
 ```
-
-Before publication, replace the `ratatui-typst` entry with
-`ratatui-typst = { path = "../ratatui-typst" }` for an application in a sibling
-directory.
 
 ```rust,no_run
 use ratatui::layout::Size;
@@ -184,8 +178,8 @@ PNG output from `image()` retains its original alpha.
 Project code is licensed under [MIT](LICENSE), copyright 2026 ratatui-typst
 contributors. Bundled dependencies and fonts retain their own licenses;
 see the [license review](licenses/REVIEW.md) and [font notices](licenses/README.md).
-`publish = false` remains set until the remaining
-[release checks](docs/RELEASE.md) pass. No version has been published to crates.io.
+Version [0.1.0](https://crates.io/crates/ratatui-typst/0.1.0) is the first release.
+See the [release checklist](docs/RELEASE.md) for verification and publication steps.
 
 References: [Typst math](https://typst.app/docs/reference/math/),
 [Typst World interface](https://docs.rs/typst/0.15.1/typst/trait.World.html),
