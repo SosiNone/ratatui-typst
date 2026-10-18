@@ -16,7 +16,7 @@ updated lockfile; the three locked jobs continue to check the reviewed graph.
 | Local check on Windows, Rust/Cargo 1.93.0 | Result |
 | --- | --- |
 | `task check` | Passed: formatting, workspace Clippy with warnings denied, 24 tests, 1 doctest, consumer smoke, and docs with warnings denied |
-| Locked offline archive verification during preparation | Passed with `--allow-dirty`; 27 files, approximately 414 KiB compressed |
+| Clean-checkout `task package` | Passed without `--allow-dirty`: 27 files, approximately 413 KiB compressed, required files and VCS metadata verified |
 | Extracted crate without the workspace demo | Passed: 10 tests, 1 doctest, and public consumer smoke |
 | Dependency inventory | 445 third-party packages; bundled Typst notices match; 31 missing notice files remain a binary-distribution collection gap |
 | Fresh RustSec audit | Same two mitigated quick-xml findings and six maintenance warnings; raw exit 1, no ignores |

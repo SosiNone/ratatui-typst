@@ -53,7 +53,8 @@ separately if you intend to claim support for them.
 
 - Automated half-block consumer: passed against Ratatui's `TestBackend`.
 - Interactive PTY: half-block startup and keyboard lifecycle checks; results in
-  [RELEASE.md](RELEASE.md). This is not Kitty/SIXEL validation.
+  the [Windows demo report](https://github.com/SosiNone/ratatui-typst/blob/main/demo/README.md#readme-screenshot-and-validation-2026-10-11).
+  This is not Kitty/SIXEL validation.
 - The maintainer reports that rendering looks good on Windows with PowerShell.
   The displayed backend was confirmed as **Sixel**. This is a positive manual
   SIXEL rendering result. Windows Terminal 1.24.12741.0 is installed; the tested
